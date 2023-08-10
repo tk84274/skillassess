@@ -1,22 +1,26 @@
 package com.exam.skillassess.entity;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table(name="user")
-public class User {
+public class User implements UserDetails{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -26,7 +30,7 @@ public class User {
 	private String lastName;
 	private String email;
 	private String phone;
-	  String activityStatus;
+	private String activityStatus;
 	
 	@OneToMany(cascade = CascadeType.ALL, /*fetch = FetchType.EAGER */ mappedBy = "user")
 	@JsonIgnore
@@ -42,15 +46,23 @@ public class User {
 	public void setID(Long iD) {
 		id = iD;
 	}
-	public String getUSERNAME() {
-		return username;
+	public Set<UserRole> getRoles() {
+		return roles;
 	}
+
+	public void setRoles(Set<UserRole> roles) {
+		this.roles = roles;
+	}
+
+//	public String getUSERNAME() {
+//		return username;
+//	}
 	public void setUSERNAME(String uSERNAME) {
 		username = uSERNAME;
 	}
-	public String getPASSWORD() {
-		return password;
-	}
+//	public String getPASSWORD() {
+//		return password;
+//	}
 	public void setPASSWORD(String pASSWORD) {
 		password = pASSWORD;
 	}
@@ -66,7 +78,6 @@ public class User {
 	public void setPHONE(String pHONE) {
 		phone = pHONE;
 	}
-	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -102,6 +113,49 @@ public class User {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", first_name=" + firstName
 				+ ", last_name=" + lastName + ", email=" + email + ", phone=" + phone + ", activity_status="
 				+ activityStatus + ", roles=" + roles + "]";
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		Set<Authority> roles = new HashSet<>();
+		this.roles.forEach(userRole -> {
+			roles.add(new Authority(userRole.getRole().getROLE_NAME()));
+		});
+		return roles;
+	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.username;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return this.activityStatus.equals("30") ? false : true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return this.activityStatus.equals("30") ? false : true;
 	}
 	
 }

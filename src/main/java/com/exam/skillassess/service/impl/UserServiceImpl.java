@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
 		//System.out.println(user.toString());
 		User userName, email, phone;
 		try {
-			userName = this.userRepository.findFirstByUsername(user.getUSERNAME());
+			userName = this.userRepository.findFirstByUsername(user.getUsername());
 			email = this.userRepository.findFirstByEmail(user.getEMAIL());
 			phone = this.userRepository.findFirstByPhone(user.getPHONE());
 		}catch(Exception e) {
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserDetails(String username) {
-		return this.userRepository.findFirstByUsername(username);
+		return this.userRepository.findFirstByUsername(username)==null ? new User() : this.userRepository.findFirstByUsername(username);
 	}
 
 }
